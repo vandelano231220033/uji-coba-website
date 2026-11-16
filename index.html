@@ -156,12 +156,13 @@ const REPO="vandelano231220033/uji-coba-website";let BR="main",TRP=null;
 const IMX=/\.(jpe?g|png|webp|avif|gif)$/i,nat=(a,b)=>a.localeCompare(b,undefined,{numeric:true}),DI=new Map();
 function tree(){if(!TRP)TRP=(async()=>{try{const c=JSON.parse(sessionStorage.getItem("tree"));if(c&&Date.now()-c.t<3e5){BR=c.b;return c.v}}catch(e){}
 for(const b of ["main","master"]){try{const r=await fetch(`https://api.github.com/repos/${REPO}/git/trees/${b}?recursive=1`);if(!r.ok)continue;const j=await r.json(),v=j.tree.filter(x=>x.type=="blob"&&x.path.startsWith("images/")).map(x=>x.path);BR=b;try{sessionStorage.setItem("tree",JSON.stringify({t:Date.now(),b,v}))}catch(e){}return v}catch(e){}}return null})();return TRP}
+const DEFP="images/default/profil.jpg",DEFB="images/default/latar.jpg";
 function dimg(id){if(!DI.has(id))DI.set(id,(async()=>{const L0=await tree(),B="images/destinasi/"+id+"/";let nm=[];
 if(L0)nm=L0.filter(p=>p.startsWith(B)&&IMX.test(p)&&!p.slice(B.length).includes("/")).map(p=>p.slice(B.length)).sort(nat);
 else for(const n of ["profil.jpg","latar.jpg",...[1,2,3,4,5,6,7,8].map(k=>"galeri-"+k+".jpg")])if(await pi(B+n))nm.push(n);
 const pf=nm.find(n=>/^profil\./i.test(n)),lt=nm.find(n=>/^latar\./i.test(n)),u=n=>B+encodeURIComponent(n),live=async a=>(await Promise.all(a.map(n=>pi(u(n))))).map((v,i)=>v?a[i]:null).filter(Boolean);
 const [G,P,Lt]=await Promise.all([live(nm.filter(n=>n!=pf&&n!=lt)),live(pf?[pf]:[]),live(lt?[lt]:[])]);
-return{p:P[0]?u(P[0]):"",b:Lt[0]?u(Lt[0]):(G[0]?u(G[0]):""),g:G.map(n=>u(n))}})());return DI.get(id)}
+const DP=await pi(DEFP)?DEFP:"",DB=await pi(DEFB)?DEFB:"";return{p:P[0]?u(P[0]):DP,b:Lt[0]?u(Lt[0]):(G[0]?u(G[0]):DB),g:G.map(n=>u(n)),rp:!!P[0],rb:!!(Lt[0]||G[0])}})());return DI.get(id)}
 async function loadCI(){const L0=await tree();let l=[];if(L0)l=L0.filter(p=>/^images\/(hero\/[^/]+|hero-[^/]+)$/i.test(p)&&IMX.test(p)).sort(nat);else for(let n=1;n<=12;n++){const u="images/hero-"+n+".jpg";if(await pi(u))l.push(u);else break}
 const ok=await Promise.all(l.map(u=>pi(encodeURI(u))));CI=l.filter((_,i)=>ok[i]).map(u=>encodeURI(u)).slice(0,12)}
 function ci(root){root.querySelectorAll(".card[data-id]").forEach(async c=>{const id=c.dataset.id,d=D.find(x=>x[0]==id);if(!d||d[9]||d[8])return;const x=await dimg(id),u=x.b||x.p;if(u&&c.isConnected)c.querySelector(".im").style.background=`url('${u}') center/cover`})}
@@ -198,7 +199,7 @@ const w=document.getElementById("fw"),ed=n?"":" (kosongkan jika tidak diganti)";
 tl(w);const fo=w.firstChild;
 const fg=async rf=>{const sl=n?uid(fo.elements.n.value.trim()||"nama-destinasi"):d[0],el=document.getElementById("fgl");if(!el)return;if(rf){TRP=null;try{sessionStorage.removeItem("tree")}catch(e){}}DI.delete(sl);await tree();
 el.innerHTML=`<p style="margin:0 0 6px"><code>images/destinasi/${sl}/</code></p><a class="btn s c" target="_blank" rel="noopener" href="https://github.com/${REPO}/upload/${BR}/images/destinasi/${sl}">${T("Buka halaman unggah folder ini")}</a><div id="fgs" style="margin-top:8px">…</div>`;
-const x=await dimg(sl),f=document.getElementById("fgs");if(f)f.innerHTML=`<div class="row"><span>${T("Foto Profil")}</span><span>${x.p?"✔":"✖"}</span></div><div class="row"><span>${T("Foto Background")}</span><span>${x.b?"✔":"✖"}</span></div><div class="row"><span>${T("Foto Galeri")}</span><span>${x.g.length}</span></div>`};
+const x=await dimg(sl),f=document.getElementById("fgs");if(f)f.innerHTML=`<div class="row"><span>${T("Foto Profil")}</span><span>${x.rp?"✔":"default"}</span></div><div class="row"><span>${T("Foto Background")}</span><span>${x.rb?"✔":"default"}</span></div><div class="row"><span>${T("Foto Galeri")}</span><span>${x.g.length}</span></div>`};
 fo.elements.k.onchange=()=>{fo.elements.kc.innerHTML=kco(fo.elements.k.value,"")};let ft;fo.elements.n.oninput=()=>{clearTimeout(ft);ft=setTimeout(()=>fg(),500)};fg(1);
 if(window.L){try{const c0=d[11]!=null?[d[11],d[12]]:[-0.03,109.34],pm=L.map("pk").setView(c0,d[11]!=null?11:7);L.tileLayer(TILE,TO).addTo(pm);let mk=d[11]!=null?L.marker(c0,{icon:pin()}).addTo(pm):null;pm.on("click",e=>{const ll=[+e.latlng.lat.toFixed(5),+e.latlng.lng.toFixed(5)];if(mk)mk.setLatLng(ll);else mk=L.marker(ll,{icon:pin()}).addTo(pm);fo.elements.x.value=ll.join(", ")})}catch(x){}}
 fo.onsubmit=async e=>{e.preventDefault();const v=k=>fo.elements[k].value;let p=d[8]||"",b=d[9]||"",ga=d[10]||[];
